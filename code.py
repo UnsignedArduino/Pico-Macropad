@@ -95,36 +95,29 @@ with leds:
             config = load(file)
 
         key_config = config["keys"]
-        
-        offset = 0
-        brightness = 0
 
         while True:
-            offset = (offset + 0.1) % 6.212
-            
             macros_to_run = []
 
             for index, button in enumerate(buttons):
                 button.update()
-                b_off = (3.14 / 16) * index
-                bright = (sin(offset - 1.5 + b_off) + 1) / 4 + 0.5
                 if button_names[index] in key_config:
                     name = button_names[index]
                     if button.value:
                         r, g, b = key_config[name]["on_color"]
-                        leds[index] = (r, g, b, bright)
+                        leds[index] = (r, g, b)
                     else:
                         r, g, b = key_config[name]["off_color"]
-                        leds[index] = (r, g, b, bright)
+                        leds[index] = (r, g, b)
                     if button.rose:
                         macros_to_run.append(name)
                 else:
                     if button.value:
                         r, g, b = config["default_on_color"]
-                        leds[index] = (r, g, b, bright)
+                        leds[index] = (r, g, b)
                     else:
                         r, g, b = config["default_off_color"]
-                        leds[index] = (r, g, b, bright)
+                        leds[index] = (r, g, b)
 
             leds.show()
             
