@@ -4,7 +4,6 @@
     "project_root": "E:\\Pico Macropad",
     "sync_location": "F:",
     "files_to_sync": [
-        "lib",
         "code.py",
         "config.json"
     ]
