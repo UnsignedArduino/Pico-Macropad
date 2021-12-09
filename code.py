@@ -93,6 +93,8 @@ class Macropad:
     def run(self):
         with self.leds:
             while True:
+                macros_to_run = []
+                
                 for index, button in enumerate(self.buttons):
                     button.update()
                     if index > 11:
@@ -124,12 +126,18 @@ class Macropad:
                             key_config = keys_config[f"{index}"]
                             off_color = key_config["off_color"]
                             on_color = key_config["on_color"]
+                            if button.rose:
+                                macros_to_run.append(key_config["macro"])
                         else:
                             off_color = self.default_config["off_color"]
                             on_color = self.default_config["on_color"]
                         self.leds[index] = on_color if button.value else off_color
                 
                 self.leds.show()
+                
+                for macro in macros_to_run:
+                    self.run_macro(macro)
+                
                 sleep(0.01)
 
 
