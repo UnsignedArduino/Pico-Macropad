@@ -1,76 +1,60 @@
 {
-	"default_on_color": [255, 255, 255],
-	"default_off_color": [16, 16, 16],
-	"keys": {
+	"default": {
+		"selected_color": [128, 128, 128],
+		"unselected_color": [16, 16, 16],
+		"pressed_color": [255, 255, 255],
+		"on_color": [255, 255, 255],
+		"off_color": [16, 16, 16]
+	}
+	"sets": {
 		"0": {
-			"off_color": [16, 0, 0],
-			"on_color": [255, 0, 0],
-			"macro": [
-				{
-					"action": "press",
-					"key": [224, 226, 4]
+			"selected_color": [32, 32, 128],
+			"unselected_color": [8, 8, 16],
+			"pressed_color": [64, 64, 255], 
+			"keys": {
+				"0": {
+					"off_color": [16, 0, 0],
+					"on_color": [255, 0, 0],
+					"macro": [
+						{
+							"action": "press",
+							"key": [224, 226, 4]
+						},
+						{
+							"action": "release",
+							"key": [224, 226, 4]
+						}
+					]
 				},
-				{
-					"action": "release",
-					"key": [224, 226, 4]
-				}
-			]
-		},
-		"1": {
-			"off_color": [16, 16, 0],
-			"on_color": [255, 255, 0],
-			"macro": [
-				{
-					"action": "press",
-					"key": [224, 226, 7]
+				"1": {
+					"off_color": [16, 16, 0],
+					"on_color": [255, 255, 0],
+					"macro": [
+						{
+							"action": "press",
+							"key": [224, 226, 7]
+						},
+						{
+							"action": "release",
+							"key": [224, 226, 7]
+						}
+					]
 				},
-				{
-					"action": "release",
-					"key": [224, 226, 7]
+				"2": {
+					"off_color": [16, 0, 16],
+					"on_color": [255, 0, 255],
+					"macro": [
+						{
+							"action": "press",
+							"key": [224, 226, 22]
+						},
+						{
+							"action": "release",
+							"key": [224, 226, 22]
+						}
+					]
 				}
-			]
-		},
-		"2": {
-			"off_color": [16, 0, 16],
-			"on_color": [255, 0, 255],
-			"macro": [
-				{
-					"action": "press",
-					"key": [224, 226, 22]
-				},
-				{
-					"action": "release",
-					"key": [224, 226, 22]
-				}
-			]
-		},
-		"4": {
-			"off_color": [16, 0, 0],
-			"on_color": [255, 0, 0],
-			"macro": [
-				{
-					"action": "press",
-					"key": [224, 225, 21]
-				},
-				{
-					"action": "release",
-					"key": [224, 225, 21]
-				}
-			]
-		},
-		"5": {
-			"off_color": [8, 8, 16],
-			"on_color": [32, 32, 255],
-			"macro": [
-				{
-					"action": "press",
-					"key": [224, 225, 19]
-				},
-				{
-					"action": "release",
-					"key": [224, 225, 19]
-				}
-			]
+			}
 		}
 	}
 }

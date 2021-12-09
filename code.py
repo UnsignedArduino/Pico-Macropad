@@ -19,8 +19,12 @@ config_path = "config.json"
 class Macropad:
     def __init__(self, config):
         self.config = config
-        self.key_config = self.config["keys"]
-        
+        self.default_config = self.config["default"]
+        self.set_config = self.config["sets"]
+        self.selected_set = 0
+        self.init_hardware()
+    
+    def init_hardware(self):
         self.i2c = I2C(scl=GP5, sda=GP4)
         self.expander = TCA9555(self.i2c)
         self.leds = DotStar(GP18, GP19, 16, brightness=0.1, auto_write=False)
@@ -56,8 +60,6 @@ class Macropad:
             Debouncer(lambda: not self.expander.input_port_1_pin_6),
             Debouncer(lambda: not self.expander.input_port_1_pin_7),
         )
-        self.button_names = ["0", "1", "2", "3", "4", "5", "6", "7",
-                             "8", "9", "A", "B", "C", "D", "E", "F"]
     
     def run_macro(self, macro):
         self.builtin_led.value = True
@@ -88,37 +90,46 @@ class Macropad:
         self.keyboard.release_all()
         self.builtin_led.value = False
 
-    
     def run(self):
         with self.leds:
             while True:
-                macros_to_run = []
-
                 for index, button in enumerate(self.buttons):
                     button.update()
-                    if self.button_names[index] in self.key_config:
-                        name = self.button_names[index]
-                        if button.value:
-                            r, g, b = self.key_config[name]["on_color"]
-                            self.leds[index] = (r, g, b)
+                    if index > 11:
+                        if f"{index - 12}" in self.set_config:
+                            selected_color = self.set_config[f"{index - 12}"]["selected_color"]
+                            unselected_color = self.set_config[f"{index - 12}"]["unselected_color"]
+                            pressed_color = self.set_config[f"{index - 12}"]["pressed_color"]
                         else:
-                            r, g, b = self.key_config[name]["off_color"]
-                            self.leds[index] = (r, g, b)
+                            selected_color = self.default_config["selected_color"]
+                            unselected_color = self.default_config["unselected_color"]
+                            pressed_color = self.default_config["pressed_color"]
                         if button.rose:
-                            macros_to_run.append(name)
-                    else:
+                            self.selected_set = index - 12
                         if button.value:
-                            r, g, b = self.config["default_on_color"]
-                            self.leds[index] = (r, g, b)
+                            self.leds[index] = pressed_color
                         else:
-                            r, g, b = self.config["default_off_color"]
-                            self.leds[index] = (r, g, b)
-
+                            if self.selected_set == index - 12:
+                                self.leds[index] = selected_color
+                            else:
+                                self.leds[index] = unselected_color
+                    else:
+                        if f"{self.selected_set}" not in self.set_config:
+                            off_color = self.default_config["off_color"]
+                            on_color = self.default_config["on_color"]
+                            self.leds[index] = on_color if button.value else off_color
+                            continue
+                        keys_config = self.set_config[f"{self.selected_set}"]["keys"]
+                        if f"{index}" in keys_config:
+                            key_config = keys_config[f"{index}"]
+                            off_color = key_config["off_color"]
+                            on_color = key_config["on_color"]
+                        else:
+                            off_color = self.default_config["off_color"]
+                            on_color = self.default_config["on_color"]
+                        self.leds[index] = on_color if button.value else off_color
+                
                 self.leds.show()
-                
-                for name in macros_to_run:
-                    self.run_macro(self.key_config[name]["macro"])
-                
                 sleep(0.01)
 
 
