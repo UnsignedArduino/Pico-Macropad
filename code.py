@@ -13,35 +13,50 @@ from rainbowio import colorwheel
 from time import sleep
 from usb_hid import devices
 
-config_path = "config.json"
+# Constants
+CONFIG_PATH = "config.json"
 
 
-class Macropad:
+class MacroPad:
     def __init__(self, config):
         self.config = config
+        # Holds settings like default key color for unused keys
         self.default_config = self.config["default"]
+        # Holds all the sets
         self.set_config = self.config["sets"]
         self.selected_set = 0
+        # Initialize hardware
         self.init_hardware()
-    
+
     def init_hardware(self):
+        # Create I2C
         self.i2c = I2C(scl=GP5, sda=GP4)
+        # Create expander
         self.expander = TCA9555(self.i2c)
+        # Create DotStar
         self.leds = DotStar(GP18, GP19, 16, brightness=0.1, auto_write=False)
 
-        self.expander_cs = DigitalInOut(GP17)
-        self.expander_cs.direction = Direction.OUTPUT
-        self.expander_cs.value = False
+        # Create DotStar CS pin but since we don't have to share SPI we can
+        # keep it low (selected) forever
+        self.led_cs = DigitalInOut(GP17)
+        self.led_cs.direction = Direction.OUTPUT
+        self.led_cs.value = False
 
+        # Create builtin LED
         self.builtin_led = DigitalInOut(GP25)
         self.builtin_led.direction = Direction.OUTPUT
+        # This LED lights up whenever USB stuff is happening
         self.builtin_led.value = True
 
+        # Race condition prevention
         sleep(0.5)
-        self.keyboard = Keyboard(devices)
-        self.keyboard_layout = KeyboardLayoutUS(self.keyboard)
-        self.builtin_led.value = False
 
+        # Make keyboard object
+        self.keyboard = Keyboard(devices)
+        # Make keyboard layout object so we can type strings
+        self.keyboard_layout = KeyboardLayoutUS(self.keyboard)
+
+        # Create Debouncer instances that just read the expander
         self.buttons = (
             Debouncer(lambda: not self.expander.input_port_0_pin_0),
             Debouncer(lambda: not self.expander.input_port_0_pin_1),
@@ -62,21 +77,39 @@ class Macropad:
         )
     
     def run_macro(self, macro):
+        # Run a macro that looks something like this:
+        # [
+        #   {
+        # 	  "action": "press",
+        # 	  "key": [224, 225, 16]
+        # 	},
+        # 	{
+        # 	  "action": "release",
+        # 	  "key": [224, 225, 16]
+        # 	}
+        # ]
+        # Find keycodes at:
+        # https://circuitpython.readthedocs.io/projects/hid/en/latest/api.html#adafruit-hid-keycode-keycode
+        # USB activity LED
         self.builtin_led.value = True
         for action in macro:
+            # Get the key
             key = action["key"]
+            # Pressing action
             if action["action"] == "press":
                 if isinstance(key, list):
                     for k in key:
                         self.keyboard.press(k)
                 else:
                     self.keyboard.press(key)
+            # Releasing action
             elif action["action"] == "release":
                 if isinstance(key, list):
                     for k in key:
                         self.keyboard.release(k)
                 else:
                     self.keyboard.release(key)
+            # Typing action
             elif action["action"] == "type":
                 if isinstance(key, int):
                     self.keyboard.send(key)
@@ -85,23 +118,33 @@ class Macropad:
                         self.keyboard.send(k)
                 else:
                     for letter in key:
-                        self.keyboard.press(*self.keyboard_layout.keycodes(letter))
+                        # Press every key needed to type out the letter
+                        self.keyboard.press(
+                            *self.keyboard_layout.keycodes(letter)
+                        )
+                        # Release all
                         self.keyboard.release_all()
         self.keyboard.release_all()
+        # No more USB activity
         self.builtin_led.value = False
 
     def run(self):
+        # So that the LEDs turn off on exception
         with self.leds:
             while True:
+                # Run AFTER the LEDs have updated - looks better
                 macros_to_run = []
-                
+
+                # Check every button
                 for index, button in enumerate(self.buttons):
                     button.update()
+                    # Is this button a set selector
                     if index > 11:
                         if f"{index - 12}" in self.set_config:
-                            selected_color = self.set_config[f"{index - 12}"]["selected_color"]
-                            unselected_color = self.set_config[f"{index - 12}"]["unselected_color"]
-                            pressed_color = self.set_config[f"{index - 12}"]["pressed_color"]
+                            set_config = self.set_config[f"{index - 12}"]
+                            selected_color = set_config["selected_color"]
+                            unselected_color = set_config["unselected_color"]
+                            pressed_color = set_config["pressed_color"]
                         else:
                             selected_color = self.default_config["selected_color"]
                             unselected_color = self.default_config["unselected_color"]
@@ -116,33 +159,42 @@ class Macropad:
                             else:
                                 self.leds[index] = unselected_color
                     else:
+                        # Is this key not defined in the configuration
                         if f"{self.selected_set}" not in self.set_config:
+                            # Yes, set default colors
                             off_color = self.default_config["off_color"]
                             on_color = self.default_config["on_color"]
                             self.leds[index] = on_color if button.value else off_color
                             continue
+                        # Get key configuration
                         keys_config = self.set_config[f"{self.selected_set}"]["keys"]
                         if f"{index}" in keys_config:
                             key_config = keys_config[f"{index}"]
                             off_color = key_config["off_color"]
                             on_color = key_config["on_color"]
+                            # Queue macro to run only if the button has been
+                            # pressed
                             if button.rose:
                                 macros_to_run.append(key_config["macro"])
                         else:
                             off_color = self.default_config["off_color"]
                             on_color = self.default_config["on_color"]
                         self.leds[index] = on_color if button.value else off_color
-                
+
+                # Update LEDs
                 self.leds.show()
-                
+
+                # Run queued macros
                 for macro in macros_to_run:
                     self.run_macro(macro)
-                
+
+                # Delay a teensy bit
                 sleep(0.01)
 
 
-with open(config_path, mode="rt") as file:
+# Load JSON configuration
+with open(CONFIG_PATH, mode="rt") as file:
     config = load(file)
 
-mp = Macropad(config)
+mp = MacroPad(config)
 mp.run()
