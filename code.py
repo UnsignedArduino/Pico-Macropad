@@ -1,17 +1,17 @@
-from time import sleep
 from adafruit_debouncer import Debouncer
 from adafruit_dotstar import DotStar
-from board import GP5, GP4, GP17, GP18, GP19, GP25
-from busio import I2C
-from community_tca9555 import TCA9555
-from rainbowio import colorwheel
-from digitalio import DigitalInOut, Direction
-from json import load
-from usb_hid import devices
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from adafruit_hid.keycode import Keycode
+from board import GP5, GP4, GP17, GP18, GP19, GP25
+from busio import I2C
+from community_tca9555 import TCA9555
+from digitalio import DigitalInOut, Direction
+from json import load
 from math import sin
+from rainbowio import colorwheel
+from time import sleep
+from usb_hid import devices
 
 config_path = "config.json"
 
