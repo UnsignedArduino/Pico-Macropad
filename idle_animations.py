@@ -1,3 +1,6 @@
+from random import randint
+
+
 class BaseAnimation:
     def __init__(self, leds):
         self.leds = leds
@@ -16,7 +19,7 @@ class BaseAnimation:
             # Reset incrementer
             self.inc_index = 0
             # Actually increment the value used for colors
-            self.index = (self.index + 1) % 256
+            self.index += 1
 
 
 # # Copied from
@@ -60,7 +63,6 @@ class BaseAnimation:
 class SnakeAnimation(BaseAnimation):
     def __init__(self, leds):
         super().__init__(leds)
-        self.max_inc = 50
         self.leds.fill((0, 0, 0))
         self.positions = (0, 1, 5, 6, 2, 3, 7, 6, 10, 11, 15, 14, 10, 9, 13,
                           12, 8, 9, 5, 4)
@@ -78,8 +80,35 @@ class SnakeAnimation(BaseAnimation):
             self.increment_index()
 
     def increment_index(self):
-        # Actually increment the value used for colors
+        # Actually increment the value used for positions
         self.index = (self.index + 1) % len(self.positions)
 
 
-ALL_ANIMATIONS = [SnakeAnimation]
+class RandomDotAnimation(BaseAnimation):
+    def __init__(self, leds):
+        super().__init__(leds)
+        self.leds.fill((0, 0, 0))
+        self.brightness = 1
+        self.direction = 1
+
+    def tick(self):
+        color = (self.brightness, self.brightness, self.brightness, 0.1)
+        self.leds[self.index] = color
+        self.brightness += self.direction
+        if self.brightness >= 255:
+            self.direction = -1
+        elif self.brightness <= 0:
+            self.direction = 1
+            self.increment_index()
+
+    def increment_index(self):
+        # Actually increment the value used for positions
+        new_val = randint(0, self.leds.n - 1)
+        # Ensures we get a different one
+        while new_val == self.index:
+            new_val = randint(0, self.leds.n - 1)
+        self.index = new_val
+
+
+ALL_ANIMATIONS = [SnakeAnimation, RandomDotAnimation]
+# ALL_ANIMATIONS = [RandomDotAnimation]
