@@ -198,16 +198,19 @@ class MacroPad:
                             self.last_use_time = monotonic_ns()
                             macro = self.handle_button(button, index)
                             if macro is not None:
+                                # Queue macro to run
                                 macros_to_run.append(macro)
+                            # Runs macro immediately, so then we can start the
+                            # next paint cycle
                             break
                     else:
                         macro = self.handle_button(button, index)
                         if macro is not None:
+                            # Queue macro to run
                             macros_to_run.append(macro)
                         if button.value:
                             self.last_use_time = monotonic_ns()
 
-                # Update LEDs
                 self.leds.show()
 
                 # Run queued macros
