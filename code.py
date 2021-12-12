@@ -10,8 +10,11 @@ from digitalio import DigitalInOut, Direction
 from json import load
 from math import sin
 from rainbowio import colorwheel
+from random import choice
 from time import sleep, monotonic_ns
 from usb_hid import devices
+
+from idle_animations import BlankAnimation
 
 # Constants
 CONFIG_PATH = "config.json"
@@ -58,6 +61,9 @@ class MacroPad:
         self.keyboard = Keyboard(devices)
         # Make keyboard layout object so we can type strings
         self.keyboard_layout = KeyboardLayoutUS(self.keyboard)
+
+        # No more USB activity for now
+        self.builtin_led.value = False
 
         # Create Debouncer instances that just read the expander
         self.buttons = (
@@ -135,6 +141,12 @@ class MacroPad:
         # Returns whether we are idle or not
         return monotonic_ns() - self.last_use_time > IDLE_TIME
 
+    def pick_idle_animation(self):
+        if self.idle_anim is None:
+            animations = [BlankAnimation]
+            # Get a random animation class and initiate it
+            self.idle_anim = choice(animations)(self.leds)
+
     def handle_button(self, button, index):
         macro = None
         # Is this button a set selector
@@ -184,6 +196,8 @@ class MacroPad:
     def run(self):
         # So that the LEDs turn off on exception
         with self.leds:
+            self.idle_anim = None
+            previously_idle = False
             while True:
                 # Run AFTER the LEDs have updated - looks better
                 macros_to_run = []
@@ -193,9 +207,13 @@ class MacroPad:
                     button.update()
                     if self.is_idle():
                         # Idle animation
-                        self.leds.fill((0, 0, 0))
+                        if not previously_idle:
+                            self.pick_idle_animation()
+                            previously_idle = True
+                        self.idle_anim.tick()
                         if button.value:
                             self.last_use_time = monotonic_ns()
+                            previously_idle = False
                             macro = self.handle_button(button, index)
                             if macro is not None:
                                 # Queue macro to run
