@@ -10,11 +10,12 @@ from digitalio import DigitalInOut, Direction
 from json import load
 from math import sin
 from rainbowio import colorwheel
-from time import sleep
+from time import sleep, monotonic_ns
 from usb_hid import devices
 
 # Constants
 CONFIG_PATH = "config.json"
+IDLE_TIME = 5_000_000_000
 
 
 class MacroPad:
@@ -27,6 +28,8 @@ class MacroPad:
         self.selected_set = 0
         # Initialize hardware
         self.init_hardware()
+        # Last time since we idled
+        self.last_use_time = monotonic_ns()
 
     def init_hardware(self):
         # Create I2C
@@ -128,6 +131,54 @@ class MacroPad:
         # No more USB activity
         self.builtin_led.value = False
 
+    def is_idle(self):
+        # Returns whether we are idle or not
+        return monotonic_ns() - self.last_use_time > IDLE_TIME
+
+    def handle_button(self, button, index):
+        # Is this button a set selector
+        if index > 11:
+            if f"{index - 12}" in self.set_config:
+                set_config = self.set_config[f"{index - 12}"]
+                selected_color = set_config["selected_color"]
+                unselected_color = set_config["unselected_color"]
+                pressed_color = set_config["pressed_color"]
+            else:
+                selected_color = self.default_config["selected_color"]
+                unselected_color = self.default_config["unselected_color"]
+                pressed_color = self.default_config["pressed_color"]
+            if button.rose:
+                self.selected_set = index - 12
+            if button.value:
+                self.leds[index] = pressed_color
+            else:
+                if self.selected_set == index - 12:
+                    self.leds[index] = selected_color
+                else:
+                    self.leds[index] = unselected_color
+        else:
+            # Is this key not defined in the configuration
+            if f"{self.selected_set}" not in self.set_config:
+                # Yes, set default colors
+                off_color = self.default_config["off_color"]
+                on_color = self.default_config["on_color"]
+                self.leds[index] = on_color if button.value else off_color
+                return
+            # Get key configuration
+            keys_config = self.set_config[f"{self.selected_set}"]["keys"]
+            if f"{index}" in keys_config:
+                key_config = keys_config[f"{index}"]
+                off_color = key_config["off_color"]
+                on_color = key_config["on_color"]
+                # Queue macro to run only if the button has been
+                # pressed
+                if button.rose:
+                    macros_to_run.append(key_config["macro"])
+            else:
+                off_color = self.default_config["off_color"]
+                on_color = self.default_config["on_color"]
+            self.leds[index] = on_color if button.value else off_color
+
     def run(self):
         # So that the LEDs turn off on exception
         with self.leds:
@@ -138,48 +189,17 @@ class MacroPad:
                 # Check every button
                 for index, button in enumerate(self.buttons):
                     button.update()
-                    # Is this button a set selector
-                    if index > 11:
-                        if f"{index - 12}" in self.set_config:
-                            set_config = self.set_config[f"{index - 12}"]
-                            selected_color = set_config["selected_color"]
-                            unselected_color = set_config["unselected_color"]
-                            pressed_color = set_config["pressed_color"]
-                        else:
-                            selected_color = self.default_config["selected_color"]
-                            unselected_color = self.default_config["unselected_color"]
-                            pressed_color = self.default_config["pressed_color"]
-                        if button.rose:
-                            self.selected_set = index - 12
+                    if self.is_idle():
+                        # Idle animation
+                        self.leds.fill((0, 0, 0))
                         if button.value:
-                            self.leds[index] = pressed_color
-                        else:
-                            if self.selected_set == index - 12:
-                                self.leds[index] = selected_color
-                            else:
-                                self.leds[index] = unselected_color
+                            self.last_use_time = monotonic_ns()
+                            self.handle_button(button, index)
+                            break
                     else:
-                        # Is this key not defined in the configuration
-                        if f"{self.selected_set}" not in self.set_config:
-                            # Yes, set default colors
-                            off_color = self.default_config["off_color"]
-                            on_color = self.default_config["on_color"]
-                            self.leds[index] = on_color if button.value else off_color
-                            continue
-                        # Get key configuration
-                        keys_config = self.set_config[f"{self.selected_set}"]["keys"]
-                        if f"{index}" in keys_config:
-                            key_config = keys_config[f"{index}"]
-                            off_color = key_config["off_color"]
-                            on_color = key_config["on_color"]
-                            # Queue macro to run only if the button has been
-                            # pressed
-                            if button.rose:
-                                macros_to_run.append(key_config["macro"])
-                        else:
-                            off_color = self.default_config["off_color"]
-                            on_color = self.default_config["on_color"]
-                        self.leds[index] = on_color if button.value else off_color
+                        self.handle_button(button, index)
+                        if button.value:
+                            self.last_use_time = monotonic_ns()
 
                 # Update LEDs
                 self.leds.show()
