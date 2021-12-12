@@ -21,6 +21,9 @@ class BaseAnimation:
             # Actually increment the value used for colors
             self.index += 1
 
+    def __repr__(self):
+        return f"BaseAnimation(leds)"
+
 
 # # Copied from
 # # https://learn.adafruit.com/hacking-ikea-lamps-with-circuit-playground-express/generate-your-colors#colorwheel-or-wheel-explained-2982566-3
@@ -58,20 +61,24 @@ class BaseAnimation:
 #             self.inc_index = 0
 #             # Actually increment the value used for colors
 #             self.index = (self.index + 1) % 256
+#
+#     def __repr__(self):
+#         return f"RainbowAnimation(leds)"
+#
 
 
-class SnakeAnimation(BaseAnimation):
-    def __init__(self, leds):
+class BasePresetAnimation(BaseAnimation):
+    def __init__(self, leds, positions=()):
         super().__init__(leds)
         self.leds.fill((0, 0, 0))
-        self.positions = (0, 1, 5, 6, 2, 3, 7, 6, 10, 11, 15, 14, 10, 9, 13,
-                          12, 8, 9, 5, 4)
+        self.positions = positions
         self.brightness = 1
         self.direction = 1
 
     def tick(self):
         color = (self.brightness, self.brightness, self.brightness, 0.1)
-        self.leds[self.positions[self.index]] = color
+        for position in self.positions[self.index]:
+            self.leds[position] = color
         self.brightness += self.direction
         if self.brightness >= 255:
             self.direction = -1
@@ -83,17 +90,34 @@ class SnakeAnimation(BaseAnimation):
         # Actually increment the value used for positions
         self.index = (self.index + 1) % len(self.positions)
 
+    def __repr__(self):
+        return f"BasePresetAnimation(leds, positions={self.positions})"
 
-class RandomDotAnimation(BaseAnimation):
+
+class PresetSnakeAnimation(BasePresetAnimation):
     def __init__(self, leds):
+        super().__init__(leds, ((0, ), (1, ), (5, ), (6, ), (2, ), (3, ),
+                                (7, ), (6, ), (10, ), (11, ), (15, ), (14, ),
+                                (10, ), (9, ), (13, ), (12, ), (8, ), (9, ),
+                                (5, ), (4, )))
+
+    def __repr__(self):
+        return f"SnakeAnimation(leds)"
+
+
+class BaseRandomDotsAnimation(BaseAnimation):
+    def __init__(self, leds, max_led):
         super().__init__(leds)
         self.leds.fill((0, 0, 0))
+        self.max_led = max_led
         self.brightness = 1
         self.direction = 1
+        self.indexes = []
 
     def tick(self):
         color = (self.brightness, self.brightness, self.brightness, 0.1)
-        self.leds[self.index] = color
+        for index in self.indexes:
+            self.leds[index] = color
         self.brightness += self.direction
         if self.brightness >= 255:
             self.direction = -1
@@ -102,13 +126,27 @@ class RandomDotAnimation(BaseAnimation):
             self.increment_index()
 
     def increment_index(self):
-        # Actually increment the value used for positions
-        new_val = randint(0, self.leds.n - 1)
-        # Ensures we get a different one
-        while new_val == self.index:
+        self.indexes = []
+        for _ in range(self.max_led):
             new_val = randint(0, self.leds.n - 1)
-        self.index = new_val
+            # Ensures we get a different one
+            while new_val in self.indexes:
+                new_val = randint(0, self.leds.n - 1)
+            self.indexes.append(new_val)
+
+    def __repr__(self):
+        return f"BaseRandomDotsAnimation(leds, max_led={self.max_led})"
 
 
-ALL_ANIMATIONS = [SnakeAnimation, RandomDotAnimation]
-# ALL_ANIMATIONS = [RandomDotAnimation]
+class RandomDotsAnimation(BaseRandomDotsAnimation):
+    def __init__(self, leds):
+        # Create a base random dots animation but with a variable amount of
+        # dots
+        super().__init__(leds, randint(1, 4))
+
+    def __repr__(self):
+        return f"RandomDotsAnimation(leds, max_led={self.max_led})"
+
+
+# ALL_ANIMATIONS = [PresetSnakeAnimation, RandomDotsAnimation]
+ALL_ANIMATIONS = [PresetSnakeAnimation]

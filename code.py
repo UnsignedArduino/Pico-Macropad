@@ -205,6 +205,7 @@ class MacroPad:
                         # Idle animation
                         if not previously_idle:
                             self.pick_idle_animation()
+                            print(f"New idle animation: {self.idle_anim}")
                             previously_idle = True
                         self.idle_anim.tick()
                         if button.value:
@@ -228,6 +229,8 @@ class MacroPad:
                 self.leds.show()
 
                 # Run queued macros
+                if len(macros_to_run) > 0:
+                    print(f"Running {len(macros_to_run)} macro(s)")
                 for macro in macros_to_run:
                     self.run_macro(macro)
 
