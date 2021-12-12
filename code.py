@@ -136,6 +136,7 @@ class MacroPad:
         return monotonic_ns() - self.last_use_time > IDLE_TIME
 
     def handle_button(self, button, index):
+        macro = None
         # Is this button a set selector
         if index > 11:
             if f"{index - 12}" in self.set_config:
@@ -163,7 +164,7 @@ class MacroPad:
                 off_color = self.default_config["off_color"]
                 on_color = self.default_config["on_color"]
                 self.leds[index] = on_color if button.value else off_color
-                return
+                return None
             # Get key configuration
             keys_config = self.set_config[f"{self.selected_set}"]["keys"]
             if f"{index}" in keys_config:
@@ -173,11 +174,12 @@ class MacroPad:
                 # Queue macro to run only if the button has been
                 # pressed
                 if button.rose:
-                    macros_to_run.append(key_config["macro"])
+                    macro = key_config["macro"]
             else:
                 off_color = self.default_config["off_color"]
                 on_color = self.default_config["on_color"]
             self.leds[index] = on_color if button.value else off_color
+        return macro
 
     def run(self):
         # So that the LEDs turn off on exception
@@ -194,10 +196,14 @@ class MacroPad:
                         self.leds.fill((0, 0, 0))
                         if button.value:
                             self.last_use_time = monotonic_ns()
-                            self.handle_button(button, index)
+                            macro = self.handle_button(button, index)
+                            if macro is not None:
+                                macros_to_run.append(macro)
                             break
                     else:
-                        self.handle_button(button, index)
+                        macro = self.handle_button(button, index)
+                        if macro is not None:
+                            macros_to_run.append(macro)
                         if button.value:
                             self.last_use_time = monotonic_ns()
 
