@@ -148,5 +148,5 @@ class RandomDotsAnimation(BaseRandomDotsAnimation):
         return f"RandomDotsAnimation(leds, max_led={self.max_led})"
 
 
-# ALL_ANIMATIONS = [PresetSnakeAnimation, RandomDotsAnimation]
-ALL_ANIMATIONS = [PresetSnakeAnimation]
+ALL_ANIMATIONS = [PresetSnakeAnimation, RandomDotsAnimation]
+# ALL_ANIMATIONS = [PresetSnakeAnimation]
