@@ -8,17 +8,15 @@ from busio import I2C
 from community_tca9555 import TCA9555
 from digitalio import DigitalInOut, Direction
 from json import load
-from math import sin
-from rainbowio import colorwheel
 from random import choice
 from time import sleep, monotonic_ns
 from usb_hid import devices
 
-from idle_animations import BlankAnimation
+from idle_animations import ALL_ANIMATIONS
 
 # Constants
 CONFIG_PATH = "config.json"
-IDLE_TIME = 5_000_000_000
+IDLE_TIME = 2_000_000_000
 
 
 class MacroPad:
@@ -142,10 +140,8 @@ class MacroPad:
         return monotonic_ns() - self.last_use_time > IDLE_TIME
 
     def pick_idle_animation(self):
-        if self.idle_anim is None:
-            animations = [BlankAnimation]
-            # Get a random animation class and initiate it
-            self.idle_anim = choice(animations)(self.leds)
+        # Get a random animation class and initiate it
+        self.idle_anim = choice(ALL_ANIMATIONS)(self.leds)
 
     def handle_button(self, button, index):
         macro = None
