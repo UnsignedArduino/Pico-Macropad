@@ -18,11 +18,11 @@
 					"macro": [
 						{
 							"action": "press",
-							"key": [224, 227, 80]
+							"key": ["CONTROL", "WINDOWS", "LEFT_ARROW"]
 						},
 						{
 							"action": "release",
-							"key": [224, 227, 80]
+							"key": ["CONTROL", "WINDOWS", "LEFT_ARROW"]
 						}
 					]
 				},
@@ -32,11 +32,11 @@
 					"macro": [
 						{
 							"action": "press",
-							"key": [227, 43]
+							"key": ["WINDOWS", "TAB"]
 						},
 						{
 							"action": "release",
-							"key": [227, 43]
+							"key": ["WINDOWS", "TAB"]
 						}
 					]
 				},
@@ -46,11 +46,11 @@
 					"macro": [
 						{
 							"action": "press",
-							"key": [224, 227, 79]
+							"key": ["CONTROL", "WINDOWS", "RIGHT_ARROW"]
 						},
 						{
 							"action": "release",
-							"key": [224, 227, 79]
+							"key": ["CONTROL", "WINDOWS", "RIGHT_ARROW"]
 						}
 					]
 				},
@@ -60,11 +60,11 @@
 					"macro": [
 						{
 							"action": "press",
-							"key": [224, 226, 43]
+							"key": ["CONTROL", "ALT", "TAB"]
 						},
 						{
 							"action": "release",
-							"key": [224, 226, 43]
+							"key": ["CONTROL", "ALT", "TAB"]
 						}
 					]
 				},
@@ -74,11 +74,11 @@
 					"macro": [
 						{
 							"action": "press",
-							"key": [224, 227, 7]
+							"key": ["WINDOWS", "CONTROL", "D"]
 						},
 						{
 							"action": "release",
-							"key": [224, 227, 7]
+							"key": ["WINDOWS", "CONTROL", "D"]
 						}
 					]
 				},
@@ -88,11 +88,11 @@
 					"macro": [
 						{
 							"action": "press",
-							"key": [224, 227, 61]
+							"key": ["CONTROL", "WINDOWS", "F4"]
 						},
 						{
 							"action": "release",
-							"key": [224, 227, 61]
+							"key": ["CONTROL", "WINDOWS", "F4"]
 						}
 					]
 				},
@@ -102,7 +102,7 @@
 					"macro": [
 						{
 							"action": "type",
-							"key": [41]
+							"key": ["ESCAPE"]
 						}
 					]
 				}
@@ -119,11 +119,11 @@
 					"macro": [
 						{
 							"action": "press",
-							"key": [224, 225, 16]
+							"key": ["CONTROL", "SHIFT", "M"]
 						},
 						{
 							"action": "release",
-							"key": [224, 225, 16]
+							"key": ["CONTROL", "SHIFT", "M"]
 						}
 					]
 				},
@@ -133,11 +133,11 @@
 					"macro": [
 						{
 							"action": "press",
-							"key": [224, 225, 7]
+							"key": ["CONTROL", "SHIFT", "D"]
 						},
 						{
 							"action": "release",
-							"key": [224, 225, 7]
+							"key": ["CONTROL", "SHIFT", "D"]
 						}
 					]
 				},
@@ -147,11 +147,11 @@
 					"macro": [
 						{
 							"action": "press",
-							"key": [224, 226, 22]
+							"key": ["CONTROL", "ALT", "S"]
 						},
 						{
 							"action": "release",
-							"key": [224, 226, 22]
+							"key": ["CONTROL", "ALT", "S"]
 						}
 					]
 				}

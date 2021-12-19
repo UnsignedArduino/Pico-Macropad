@@ -103,14 +103,20 @@ class MacroPad:
             if action["action"] == "press":
                 if isinstance(key, list):
                     for k in key:
-                        self.keyboard.press(k)
+                        if isinstance(k, str):
+                            self.keyboard.press(getattr(Keycode, k))
+                        else:
+                            self.keyboard.press(k)
                 else:
                     self.keyboard.press(key)
             # Releasing action
             elif action["action"] == "release":
                 if isinstance(key, list):
                     for k in key:
-                        self.keyboard.release(k)
+                        if isinstance(k, str):
+                            self.keyboard.release(getattr(Keycode, k))
+                        else:
+                            self.keyboard.release(k)
                 else:
                     self.keyboard.release(key)
             # Typing action
@@ -119,7 +125,10 @@ class MacroPad:
                     self.keyboard.send(key)
                 elif isinstance(key, list):
                     for k in key:
-                        self.keyboard.send(k)
+                        if isinstance(k, str):
+                            self.keyboard.send(getattr(Keycode, k))
+                        else:
+                            self.keyboard.send(k)
                 else:
                     for letter in key:
                         # Press every key needed to type out the letter
