@@ -3,3 +3,4 @@
 .Trashes
 boot_out.txt
 lib/*
+*.bat
