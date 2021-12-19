@@ -137,6 +137,17 @@ class MacroPad:
                         )
                         # Release all
                         self.keyboard.release_all()
+            # Hotkey action - press and then release all
+            elif action["action"] == "hotkey":
+                if isinstance(key, list):
+                    for k in key:
+                        if isinstance(k, str):
+                            self.keyboard.press(getattr(Keycode, k))
+                        else:
+                            self.keyboard.press(k)
+                else:
+                    self.keyboard.press(key)
+                self.keyboard.release_all()
         self.keyboard.release_all()
         # No more USB activity
         self.builtin_led.value = False

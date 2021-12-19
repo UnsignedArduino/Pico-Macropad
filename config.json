@@ -17,11 +17,7 @@
 					"on_color": [255, 255, 0],
 					"macro": [
 						{
-							"action": "press",
-							"key": ["CONTROL", "WINDOWS", "LEFT_ARROW"]
-						},
-						{
-							"action": "release",
+							"action": "hotkey",
 							"key": ["CONTROL", "WINDOWS", "LEFT_ARROW"]
 						}
 					]
@@ -31,11 +27,7 @@
 					"on_color": [255, 128, 0],
 					"macro": [
 						{
-							"action": "press",
-							"key": ["WINDOWS", "TAB"]
-						},
-						{
-							"action": "release",
+							"action": "hotkey",
 							"key": ["WINDOWS", "TAB"]
 						}
 					]
@@ -45,11 +37,7 @@
 					"on_color": [255, 255, 0],
 					"macro": [
 						{
-							"action": "press",
-							"key": ["CONTROL", "WINDOWS", "RIGHT_ARROW"]
-						},
-						{
-							"action": "release",
+							"action": "hotkey",
 							"key": ["CONTROL", "WINDOWS", "RIGHT_ARROW"]
 						}
 					]
@@ -59,11 +47,7 @@
 					"on_color": [0, 0, 255],
 					"macro": [
 						{
-							"action": "press",
-							"key": ["CONTROL", "ALT", "TAB"]
-						},
-						{
-							"action": "release",
+							"action": "hotkey",
 							"key": ["CONTROL", "ALT", "TAB"]
 						}
 					]
@@ -73,11 +57,7 @@
 					"on_color": [0, 255, 0],
 					"macro": [
 						{
-							"action": "press",
-							"key": ["WINDOWS", "CONTROL", "D"]
-						},
-						{
-							"action": "release",
+							"action": "hotkey",
 							"key": ["WINDOWS", "CONTROL", "D"]
 						}
 					]
@@ -87,11 +67,7 @@
 					"on_color": [255, 0, 0],
 					"macro": [
 						{
-							"action": "press",
-							"key": ["CONTROL", "WINDOWS", "F4"]
-						},
-						{
-							"action": "release",
+							"action": "hotkey",
 							"key": ["CONTROL", "WINDOWS", "F4"]
 						}
 					]
@@ -118,11 +94,7 @@
 					"on_color": [255, 0, 0],
 					"macro": [
 						{
-							"action": "press",
-							"key": ["CONTROL", "SHIFT", "M"]
-						},
-						{
-							"action": "release",
+							"action": "hotkey",
 							"key": ["CONTROL", "SHIFT", "M"]
 						}
 					]
@@ -132,11 +104,7 @@
 					"on_color": [255, 255, 0],
 					"macro": [
 						{
-							"action": "press",
-							"key": ["CONTROL", "SHIFT", "D"]
-						},
-						{
-							"action": "release",
+							"action": "hotkey",
 							"key": ["CONTROL", "SHIFT", "D"]
 						}
 					]
@@ -146,11 +114,7 @@
 					"on_color": [255, 0, 255],
 					"macro": [
 						{
-							"action": "press",
-							"key": ["CONTROL", "ALT", "S"]
-						},
-						{
-							"action": "release",
+							"action": "hotkey",
 							"key": ["CONTROL", "ALT", "S"]
 						}
 					]
