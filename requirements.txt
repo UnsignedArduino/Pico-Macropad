@@ -1,0 +1,8 @@
+# These can be found in the official CircuitPython Bundle
+adafruit_hid
+adafruit_register
+adafruit_debouncer.mpy
+adafruit_dotstar.mpy
+
+# Find this in the CircuitPyton Community Bundle
+community_tca9555.mpy
