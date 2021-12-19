@@ -8,9 +8,9 @@
 	},
 	"sets": {
 		"0": {
-			"selected_color": [16, 16, 128],
-			"unselected_color": [4, 4, 16],
-			"pressed_color": [32, 32, 255],
+			"selected_color": [0, 0, 128],
+			"unselected_color": [0, 0, 16],
+			"pressed_color": [0, 0, 255],
 			"keys": {
 				"0": {
 					"off_color": [16, 16, 0],
