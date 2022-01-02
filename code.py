@@ -30,8 +30,6 @@ class MacroPad:
         self.selected_set = 0
         # Initialize hardware
         self.init_hardware()
-        # Last time since we idled
-        self.last_use_time = monotonic_ns()
 
     def init_display(self):
         # Create display and use the I2C bus for the expander
@@ -236,8 +234,6 @@ class MacroPad:
                     if macro is not None:
                         # Queue macro to run
                         macros_to_run.append(macro)
-                    if button.value:
-                        self.last_use_time = monotonic_ns()
 
                 self.leds.show()
 
