@@ -8,7 +8,9 @@ from board import GP5, GP4, GP17, GP18, GP19, GP25
 from busio import I2C
 from community_tca9555 import TCA9555
 from digitalio import DigitalInOut, Direction
-from displayio import I2CDisplay, release_displays
+from displayio import I2CDisplay, release_displays, Group
+from adafruit_display_text.label import Label
+from terminalio import FONT
 from json import load
 from random import choice
 from time import sleep, monotonic_ns
@@ -31,6 +33,17 @@ class MacroPad:
         # Last time since we idled
         self.last_use_time = monotonic_ns()
 
+    def init_display(self):
+        # Create display and use the I2C bus for the expander
+        self.display_bus = I2CDisplay(self.i2c, device_address=0x3C)
+        self.display = SSD1306(self.display_bus, width=128, height=32)
+
+        self.splash = Group()
+        self.display.show(self.splash)
+
+        self.label = Label(FONT, color=0xFFFFFF, x=4, y=4)
+        self.splash.append(self.label)
+
     def init_hardware(self):
         # Release displays so we can remake the I2C bus
         release_displays()
@@ -52,12 +65,12 @@ class MacroPad:
         self.builtin_led = DigitalInOut(GP25)
         self.builtin_led.direction = Direction.OUTPUT
 
-        # Create display and use the I2C bus for the expander
-        self.display_bus = I2CDisplay(self.i2c, device_address=0x3C)
-        self.display = SSD1306(self.display_bus, width=128, height=32)
+        # Do display stuff
+        self.init_display()
 
         # This LED lights up whenever USB stuff is happening
         self.builtin_led.value = True
+        self.label.text = "Initializing USB"
 
         # Race condition prevention
         sleep(0.5)
@@ -69,6 +82,7 @@ class MacroPad:
 
         # No more USB activity for now
         self.builtin_led.value = False
+        self.label.text = ""
 
         # Create Debouncer instances that just read the expander
         self.buttons = (
