@@ -1,4 +1,5 @@
 from adafruit_debouncer import Debouncer
+from adafruit_displayio_ssd1306 import SSD1306
 from adafruit_dotstar import DotStar
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
@@ -7,6 +8,7 @@ from board import GP5, GP4, GP17, GP18, GP19, GP25
 from busio import I2C
 from community_tca9555 import TCA9555
 from digitalio import DigitalInOut, Direction
+from displayio import I2CDisplay, release_displays
 from json import load
 from random import choice
 from time import sleep, monotonic_ns
@@ -30,6 +32,9 @@ class MacroPad:
         self.last_use_time = monotonic_ns()
 
     def init_hardware(self):
+        # Release displays so we can remake the I2C bus
+        release_displays()
+
         # Create I2C
         self.i2c = I2C(scl=GP5, sda=GP4)
         # Create expander
@@ -46,6 +51,11 @@ class MacroPad:
         # Create builtin LED
         self.builtin_led = DigitalInOut(GP25)
         self.builtin_led.direction = Direction.OUTPUT
+
+        # Create display and use the I2C bus for the expander
+        self.display_bus = I2CDisplay(self.i2c, device_address=0x3C)
+        self.display = SSD1306(self.display_bus, width=128, height=32)
+
         # This LED lights up whenever USB stuff is happening
         self.builtin_led.value = True
 
