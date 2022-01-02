@@ -1,4 +1,5 @@
 from adafruit_debouncer import Debouncer
+from adafruit_display_text.label import Label
 from adafruit_displayio_ssd1306 import SSD1306
 from adafruit_dotstar import DotStar
 from adafruit_hid.keyboard import Keyboard
@@ -9,10 +10,9 @@ from busio import I2C
 from community_tca9555 import TCA9555
 from digitalio import DigitalInOut, Direction
 from displayio import I2CDisplay, release_displays, Group
-from adafruit_display_text.label import Label
-from terminalio import FONT
 from json import load
 from random import choice
+from terminalio import FONT
 from time import sleep, monotonic_ns
 from usb_hid import devices
 
@@ -28,6 +28,10 @@ class MacroPad:
         # Holds all the sets
         self.set_config = self.config["sets"]
         self.selected_set = 0
+        # Last text and last time so we can "turn" off the display
+        self.last_text = ""
+        self.last_new_text = monotonic_ns()
+        self.new_text_time = 3_000_000_000
         # Initialize hardware
         self.init_hardware()
 
@@ -189,6 +193,7 @@ class MacroPad:
                 pressed_color = self.default_config["pressed_color"]
             if button.rose:
                 self.selected_set = index - 12
+                self.label.text = f"Switch to page {self.selected_set + 1}"
             if button.value:
                 self.leds[index] = pressed_color
             else:
@@ -223,6 +228,8 @@ class MacroPad:
     def run(self):
         # So that the LEDs turn off on exception
         with self.leds:
+            self.label.text = "Ready"
+
             while True:
                 # Run AFTER the LEDs have updated - looks better
                 macros_to_run = []
@@ -240,8 +247,21 @@ class MacroPad:
                 # Run queued macros
                 if len(macros_to_run) > 0:
                     print(f"Running {len(macros_to_run)} macro(s)")
-                for macro in macros_to_run:
-                    self.run_macro(macro)
+                    macro_start = monotonic_ns()
+                    for macro in macros_to_run:
+                        self.label.text = f"Running macro..."
+                        self.run_macro(macro)
+                    macro_end = monotonic_ns()
+                    macro_time = (macro_end - macro_start) / 1_000_000
+                    self.label.text = f"Done ({macro_time:.1f} ms)"
+
+                # Reset the last_new_text time if the text changed
+                if self.label.text != self.last_text:
+                    self.last_text = self.label.text
+                    self.last_new_text = monotonic_ns()
+                # Clear if it has went overtime
+                if monotonic_ns() - self.last_new_text > self.new_text_time:
+                    self.label.text = ""
 
                 # Delay a teensy bit
                 sleep(0.01)
