@@ -3,6 +3,9 @@ adafruit_hid
 adafruit_register
 adafruit_debouncer.mpy
 adafruit_dotstar.mpy
+adafruit_displayio_ssd1306
+adafruit_bus_device
+adafruit_display_text
 
 # Find this in the CircuitPyton Community Bundle
 community_tca9555.mpy
