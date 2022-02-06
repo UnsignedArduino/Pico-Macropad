@@ -81,6 +81,16 @@
 							"key": ["ESCAPE"]
 						}
 					]
+				},
+				"8": {
+					"off_color": [16, 16, 64],
+					"on_color": [32, 32, 128],
+					"macro": [
+						{
+							"action": "hotkey",
+							"key": ["CONTROL", "ALT", "SHIFT", "D"]
+						}
+					]
 				}
 			}
 		},
@@ -116,6 +126,47 @@
 						{
 							"action": "hotkey",
 							"key": ["CONTROL", "ALT", "S"]
+						}
+					]
+				},
+				"3": {
+					"off_color": [0, 16, 0],
+					"on_color": [0, 255, 0],
+					"macro": [
+						{
+							"action": "press",
+							"key": ["CONTROL", "ALT", "SPACE"]
+						},
+						"no_auto_release"
+					]
+				},
+				"4": {
+					"off_color": [16, 0, 0],
+					"on_color": [255, 0, 0],
+					"macro": [
+						{
+							"action": "hotkey",
+							"key": ["ALT", "A"]
+						}
+					]
+				},
+				"5": {
+					"off_color": [16, 16, 0],
+					"on_color": [255, 255, 0],
+					"macro": [
+						{
+							"action": "hotkey",
+							"key": ["ALT", "V"]
+						}
+					]
+				},
+				"7": {
+					"off_color": [16, 16, 0],
+					"on_color": [255, 255, 0],
+					"macro": [
+						{
+							"action": "release",
+							"key": ["CONTROL", "ALT", "SPACE"]
 						}
 					]
 				}

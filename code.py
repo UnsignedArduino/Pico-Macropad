@@ -116,13 +116,18 @@ class MacroPad:
         # 	{
         # 	  "action": "release",
         # 	  "key": [224, 225, 16]
-        # 	}
+        # 	},
+        #   "auto_release": false
         # ]
         # Find keycodes at:
         # https://circuitpython.readthedocs.io/projects/hid/en/latest/api.html#adafruit-hid-keycode-keycode
         # USB activity LED
         self.builtin_led.value = True
+        auto_release = True
         for action in macro:
+            if action == "no_auto_release":
+                auto_release = False
+                continue
             # Get the key
             key = action["key"]
             # Pressing action
@@ -174,9 +179,10 @@ class MacroPad:
                 else:
                     self.keyboard.press(key)
                 self.keyboard.release_all()
-        self.keyboard.release_all()
-        # No more USB activity
-        self.builtin_led.value = False
+        if auto_release:
+            self.keyboard.release_all()
+            # No more USB activity
+            self.builtin_led.value = False
 
     def handle_button(self, button, index):
         macro = None
